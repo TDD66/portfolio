@@ -3,7 +3,7 @@ options:
 
 steps:
   - name: "gcr.io/cloud-builders/gsutil"
-    args: ["-m", "rsync", "-r", "-d", "-c", ".", "gs://my-portfolio-66"]
+    args: ["-m", "rsync", "-r", "-d", "-c", "-x", "^\\.git|^\\.claude|^\\.gcloudignore$|^cloudbuild\\.yaml$", ".", "gs://my-portfolio-66"]
 
   - name: "gcr.io/cloud-builders/gcloud"
     args:

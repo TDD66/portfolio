@@ -1,0 +1,4 @@
+.git
+.claude
+.gcloudignore
+cloudbuild.yaml
