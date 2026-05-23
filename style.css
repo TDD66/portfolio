@@ -33,6 +33,20 @@ body {
     padding: 48px 24px;
 }
 
+/* Visitor counter */
+.visitor-counter {
+    position: fixed;
+    top: 16px;
+    right: 24px;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    background: var(--color-tag-bg);
+    border: 1px solid var(--color-tag-border);
+    border-radius: 4px;
+    padding: 4px 12px;
+    z-index: 10;
+}
+
 /* Header */
 header {
     text-align: center;
