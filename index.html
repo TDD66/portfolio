@@ -4,108 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tadiwanashe Dzvoti - Software Engineer</title>
+    <meta name="description" content="Tadiwanashe Dzvoti is a Java full-stack software engineer based in Manchester, UK, building scalable services on the JVM and the cloud.">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="visitor-counter" id="visitor-counter" style="visibility: hidden;">Visitor Counter: 0</div>
+
+    <nav class="site-nav" aria-label="Primary">
+        <div class="site-nav-inner">
+            <a href="/" class="site-nav-brand">Tadiwanashe Dzvoti</a>
+            <ul class="site-nav-links">
+                <li><a href="/projects.html">Projects</a></li>
+                <li><a href="/blogs.html">Blog</a></li>
+                <li><a href="/resume.html">Resume</a></li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="container">
-        <header>
-            <h1>Tadiwanashe Dzvoti</h1>
-            <div class="contact-info">
-                <span>Manchester, UK</span>
-                <span class="separator" aria-hidden="true"></span>
-                <a href="mailto:tadiwanashedzvoti@hotmail.com">tadiwanashedzvoti@hotmail.com</a>
-                <span class="separator" aria-hidden="true"></span>
-                <a href="https://linkedin.com/in/tadiwanashe-dzvoti" target="_blank" rel="noopener">LinkedIn</a>
-                <span class="separator" aria-hidden="true"></span>
-                <a href="https://github.com/TDD66" target="_blank" rel="noopener">GitHub</a>
-            </div>
-        </header>
-
-        <section>
-            <h2>Profile</h2>
-            <p>Java Full Stack Engineer with experience building and optimising high-throughput microservices using Spring Boot. Skilled in React, cloud deployments (GCP), and CI/CD pipelines (Jenkins, GitHub Actions). Experienced in working with clients to deliver scalable, business-critical solutions in agile environments.</p>
-        </section>
-
-        <section>
-            <h2>Work Experience</h2>
-
-            <div class="entry">
-                <div class="entry-header">
-                    <div>
-                        <h3>Graduate Software Engineer</h3>
-                        <span class="organisation">THG</span>
-                    </div>
-                    <div class="entry-meta">
-                        <span class="location">Manchester, UK</span>
-                        <span class="date">Sept 2024 &ndash; Present</span>
-                    </div>
-                </div>
-                <ul>
-                    <li>Developed and maintained high-performance RESTful microservices using Java Spring Boot powering order processing across multiple retail platforms.</li>
-                    <li>Optimised a core microservices-based order processing system, increasing throughput by 50% (5,000 &rarr; 7,500 orders/min) through performance tuning and architectural improvements.</li>
-                    <li>Designed and maintained CI/CD pipelines using Jenkins and GitHub Actions to automate build, test, and deployment workflows.</li>
-                    <li>Collaborated directly with external clients to integrate systems into THG's order processing platform, ensuring scalability and backwards compatibility.</li>
-                    <li>Provided 3rd line support for clients, business intelligence, and customer service agents.</li>
-                    <li>Led migration of distributed applications to Google Cloud Platform (GCP), including infrastructure setup, Docker configuration, DNS, and deployment pipeline modernisation.</li>
-                    <li>Contributed to delivery in an agile team environment, contributing to sprint planning, stand-ups, and delivery cycles.</li>
-                </ul>
+        <section class="hero">
+            <div class="hero-eyebrow">Software Engineer · Manchester, UK</div>
+            <h1>Hi, I&rsquo;m Tadiwa. I build <span class="accent">scalable backend systems</span> and ship them to the cloud.</h1>
+            <p class="hero-lead">
+                I&rsquo;m a Java full-stack engineer at THG Ingenuity, where I work on high-throughput order processing
+                microservices powering retail platforms. I care about clean APIs, fast feedback loops, and
+                well-tuned cloud infrastructure. This very site runs on GCP behind Terraform-managed CI/CD.
+            </p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="https://github.com/TDD66" target="_blank" rel="noopener">GitHub</a>
+                <a class="btn btn-secondary" href="https://www.linkedin.com/in/tadiwanashe-dzvoti-5999681a4/" target="_blank" rel="noopener">LinkedIn</a>
+                <a class="btn btn-secondary" href="mailto:tadiwanashedzvoti@hotmail.com">Email</a>
+                <a class="btn btn-secondary" href="/resume.html">Resume</a>
             </div>
         </section>
 
         <section>
-            <h2>Education</h2>
-
-            <div class="entry">
-                <div class="entry-header">
-                    <div>
-                        <h3>Software Engineering Trainee</h3>
-                        <span class="organisation">Bright Network Technology Academy</span>
-                    </div>
-                    <div class="entry-meta">
-                        <span class="location">Remote</span>
-                        <span class="date">Jan 2024 &ndash; April 2024</span>
-                    </div>
-                </div>
-                <ul>
-                    <li>Completed an intensive front-end and back-end development bootcamp.</li>
-                    <li>Developed skills in Java, JavaScript, Spring, SQL, React, HTML, and CSS.</li>
-                </ul>
-            </div>
-
-            <div class="entry">
-                <div class="entry-header">
-                    <div>
-                        <h3>Masters of Engineering, Electrical and Electronic Engineering</h3>
-                        <span class="organisation">University of Manchester</span>
-                    </div>
-                    <div class="entry-meta">
-                        <span class="location">Manchester, UK</span>
-                        <span class="date">Sept 2019 &ndash; Jun 2023</span>
-                    </div>
-                </div>
-                <ul>
-                    <li>Applied parallel computing and cloud-based processing to optimise radar signal detection.</li>
-                    <li>Developed systems involving hardware&ndash;software integration and real-time data processing.</li>
-                </ul>
-            </div>
-        </section>
-
-        <section>
-            <h2>Projects</h2>
-            <div class="entry">
-                <div class="entry-header">
-                    <div>
-                        <h3>Rate My Uni</h3>
-                        <a href="https://ratemyuni.co.uk" class="project-link" target="_blank" rel="noopener">ratemyuni.co.uk</a>
-                    </div>
-                </div>
-                <p>Built a full-stack web application using React, Spring Boot, and PostgreSQL, implementing RESTful APIs for user-generated content.</p>
-            </div>
-        </section>
-
-        <section>
-            <h2>Professional Skills</h2>
+            <h2>What I work with</h2>
             <div class="skills-grid">
                 <div class="skill-category">
                     <h3>Languages</h3>
@@ -124,27 +58,70 @@
                     </div>
                 </div>
                 <div class="skill-category">
-                    <h3>Cloud & DevOps</h3>
+                    <h3>Cloud &amp; DevOps</h3>
                     <div class="skill-tags">
                         <span class="tag">GCP</span>
+                        <span class="tag">Terraform</span>
                         <span class="tag">Docker</span>
+                        <span class="tag">Kubernetes</span>
                         <span class="tag">Jenkins</span>
                         <span class="tag">GitHub Actions</span>
-                        <span class="tag">Kubernetes</span>
                     </div>
                 </div>
                 <div class="skill-category">
-                    <h3>Tools</h3>
+                    <h3>Data &amp; Tools</h3>
                     <div class="skill-tags">
-                        <span class="tag">Git</span>
                         <span class="tag">PostgreSQL</span>
+                        <span class="tag">Firestore</span>
+                        <span class="tag">Git</span>
                         <span class="tag">Claude Code</span>
-                        <span class="tag">Codex</span>
                     </div>
                 </div>
             </div>
         </section>
+
+        <section>
+            <h2>Selected projects</h2>
+            <div class="project-cards">
+                <a class="project-card" href="https://ratemyuni.co.uk" target="_blank" rel="noopener">
+                    <div class="project-card-header">
+                        <h3>Rate My Uni</h3>
+                        <span class="project-card-link">ratemyuni.co.uk &rarr;</span>
+                    </div>
+                    <p>Full-stack web app for student reviews of UK universities, built with a React frontend, Spring Boot REST API, and PostgreSQL persistence.</p>
+                    <div class="skill-tags">
+                        <span class="tag">React</span>
+                        <span class="tag">Spring Boot</span>
+                        <span class="tag">PostgreSQL</span>
+                    </div>
+                </a>
+
+                <a class="project-card" href="https://github.com/TDD66" target="_blank" rel="noopener">
+                    <div class="project-card-header">
+                        <h3>This portfolio site</h3>
+                        <span class="project-card-link">github.com/TDD66 &rarr;</span>
+                    </div>
+                    <p>Cloud Resume Challenge build on GCP: static site on GCS behind an HTTPS load balancer + CDN, Python Cloud Run visitor counter writing to Firestore, all provisioned with Terraform and shipped through Cloud Build and GitHub Actions.</p>
+                    <div class="skill-tags">
+                        <span class="tag">GCP</span>
+                        <span class="tag">Terraform</span>
+                        <span class="tag">Cloud Run</span>
+                        <span class="tag">Python</span>
+                    </div>
+                </a>
+            </div>
+        </section>
     </div>
+
+    <footer class="site-footer">
+        &copy; <span id="year">2026</span> Tadiwanashe Dzvoti ·
+        <a href="https://github.com/TDD66" target="_blank" rel="noopener">GitHub</a> ·
+        <a href="https://www.linkedin.com/in/tadiwanashe-dzvoti-5999681a4/" target="_blank" rel="noopener">LinkedIn</a>
+    </footer>
+
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
     <script src="counter.js"></script>
 </body>
 </html>
