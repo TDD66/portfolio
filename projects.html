@@ -19,12 +19,70 @@
     </nav>
 
     <div class="container">
-        <div class="coming-soon">
-            <div class="coming-soon-eyebrow">Projects</div>
-            <h1>Coming soon</h1>
-            <p>A deeper look at things I&rsquo;ve built, from microservices to side projects, is on the way. In the meantime, the landing page lists a couple of highlights.</p>
-            <a class="btn btn-primary" href="/">Back to home</a>
+        <header class="page-header">
+            <div class="page-header-eyebrow">Projects</div>
+            <h1>Things I&rsquo;ve built</h1>
+            <p>A running list of projects I&rsquo;ve shipped. Each one is a chance to pick up a new tool, push something to production, and learn what breaks when real users (or just me) start using it.</p>
+        </header>
+
+        <div class="project-list">
+            <article class="project-entry">
+                <div class="project-entry-header">
+                    <div>
+                        <h2>Rate My Uni</h2>
+                        <span class="project-meta">Full-stack web app</span>
+                    </div>
+                    <div class="project-entry-links">
+                        <a href="https://ratemyuni.co.uk" target="_blank" rel="noopener">Live site &rarr;</a>
+                    </div>
+                </div>
+                <p>A web app that lets students post and read reviews of UK universities. I built it end-to-end: a React (Material UI) frontend backed by a Spring Boot REST API on Java 21, with PostgreSQL handling user-generated content and Cloudflare R2 storing uploaded images.</p>
+                <p>Production lives across two providers. Railway runs the API, the frontend, and Postgres on its private network. Cloudflare fronts the public hostnames for DNS, TLS, and CDN, and serves images from an R2 bucket through a custom domain (<code>rate-my-uni-images.co.uk</code>). Auth covers JWT, Google OAuth, and email magic links; transactional email goes out through Resend on top of Amazon SES, with mailboxes hosted on Zoho. The backend uses EhCache for in-process caching, which is fine for a single replica but would need swapping for something shared (Redis) before scaling out.</p>
+                <p>The interesting parts were stitching together the multi-provider setup without it turning into a mess, modelling reviews and ratings cleanly in SQL, and getting comfortable with deploying both halves of the stack to a live domain.</p>
+                <div class="skill-tags">
+                    <span class="tag">React</span>
+                    <span class="tag">Spring Boot</span>
+                    <span class="tag">Java 21</span>
+                    <span class="tag">PostgreSQL</span>
+                    <span class="tag">Cloudflare R2</span>
+                    <span class="tag">Railway</span>
+                    <span class="tag">JWT / OAuth</span>
+                </div>
+            </article>
+
+            <article class="project-entry">
+                <div class="project-entry-header">
+                    <div>
+                        <h2>This portfolio site</h2>
+                        <span class="project-meta">Cloud Resume Challenge on GCP</span>
+                    </div>
+                    <div class="project-entry-links">
+                        <a href="https://github.com/TDD66" target="_blank" rel="noopener">GitHub &rarr;</a>
+                    </div>
+                </div>
+                <p>A take on the Cloud Resume Challenge built entirely on Google Cloud. The site itself is static HTML/CSS in a GCS bucket, served through an HTTPS load balancer with Cloud CDN in front. A small Python Cloud Run function increments a Firestore counter every time the page loads.</p>
+                <p>The fun part is the plumbing. All of the GCP resources (bucket, Cloud Run service, Firestore, load balancer, SSL cert, URL maps) are defined in Terraform with state in GCS, and changes go through a GitHub Actions pipeline that runs plan on every PR and applies on merge to main. The frontend and backend each have their own Cloud Build triggers that ship on push. No service account keys anywhere, just Workload Identity Federation.</p>
+                <div class="skill-tags">
+                    <span class="tag">GCP</span>
+                    <span class="tag">Terraform</span>
+                    <span class="tag">Cloud Run</span>
+                    <span class="tag">Firestore</span>
+                    <span class="tag">Python</span>
+                    <span class="tag">GitHub Actions</span>
+                    <span class="tag">Cloud Build</span>
+                </div>
+            </article>
         </div>
     </div>
+
+    <footer class="site-footer">
+        &copy; <span id="year">2026</span> Tadiwanashe Dzvoti ·
+        <a href="https://github.com/TDD66" target="_blank" rel="noopener">GitHub</a> ·
+        <a href="https://www.linkedin.com/in/tadiwanashe-dzvoti-5999681a4/" target="_blank" rel="noopener">LinkedIn</a>
+    </footer>
+
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
