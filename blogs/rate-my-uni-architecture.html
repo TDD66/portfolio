@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Rate My Uni runs - Tadiwanashe Dzvoti</title>
+    <meta name="description" content="A walkthrough of the Rate My Uni production architecture: Railway for compute and data, Cloudflare for the public edge and R2 image storage.">
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: "base",
+            themeVariables: {
+                background: "#ffffff",
+                primaryColor: "#eef2fb",
+                primaryBorderColor: "#9fb3e0",
+                primaryTextColor: "#1c2330",
+                lineColor: "#2563eb",
+                tertiaryColor: "#f4f6fa",
+                fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                fontSize: "14px"
+            }
+        });
+    </script>
+</head>
+<body>
+    <nav class="site-nav" aria-label="Primary">
+        <div class="site-nav-inner">
+            <a href="/" class="site-nav-brand">Tadiwanashe Dzvoti</a>
+            <ul class="site-nav-links">
+                <li><a href="/projects.html">Projects</a></li>
+                <li><a href="/blogs.html" class="active" aria-current="page">Blog</a></li>
+                <li><a href="/resume.html">Resume</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <article class="article">
+            <a class="article-back" href="/blogs.html">&larr; Back to blog</a>
+
+            <header class="article-header">
+                <div class="article-meta">31 May 2026 · ~7 min read</div>
+                <h1>How Rate My Uni runs: a multi-provider Railway and Cloudflare architecture</h1>
+            </header>
+
+            <div class="article-body">
+                <p><a href="https://ratemyuni.co.uk" target="_blank" rel="noopener">Rate My Uni</a> is a full-stack web app where students post and read reviews of UK universities. The product is small. A React SPA, a Spring Boot API, a Postgres database, and a bucket for user-uploaded images. The production setup is the more interesting part. Compute and data live on Railway, and everything that faces the public internet goes through Cloudflare.</p>
+                <p>This post walks through that architecture: what runs where, why each piece sits where it does, and the rough edges I want to file down before scaling out.</p>
+
+                <h2>Topology</h2>
+                <p>Three Railway services (frontend, backend, Postgres), two Cloudflare zones (<code>ratemyuni.co.uk</code> for the site, <code>rate-my-uni-images.co.uk</code> for image hosting), and one R2 bucket sit underneath it all.</p>
+
+<div class="diagram">
+<pre class="mermaid">
+flowchart LR
+  user(["🌐 Internet / Browser"])
+
+  subgraph cf["☁️ Cloudflare · DNS · CDN · TLS"]
+    direction TB
+    edge["Proxy / WAF<br/><small>ratemyuni.co.uk · www</small>"]
+    r2[("R2 bucket<br/><small>rate-my-uni-images</small><br/><small>rate-my-uni-images.co.uk</small>")]
+  end
+
+  subgraph prod["Railway · production"]
+    direction TB
+    fe["rate-my-uni-frontend<br/><small>React SPA · Railpack</small>"]
+    be["backend<br/><small>Spring Boot · JDK 21</small>"]
+    db[("Postgres<br/><small>postgres-ssl:17</small><br/><small>postgres-volume</small>")]
+  end
+
+  user -->|"https"| edge
+  edge -->|"proxied CNAME<br/>jqe1bq9i.up.railway.app"| fe
+  user -.->|"public API<br/>REACT_APP_API_URL"| be
+  fe -.->|"API calls"| be
+  be &lt;==&gt;|"private network<br/>postgres.railway.internal:5432"| db
+  be &lt;--&gt;|"image read / write"| r2
+  user -->|"images via<br/>rate-my-uni-images.co.uk"| r2
+
+  classDef svc fill:#eef2fb,stroke:#9fb3e0,color:#1c2330;
+  classDef data fill:#e6f5ee,stroke:#7cc4a2,color:#14402e;
+  classDef edge fill:#fdf3dc,stroke:#e0b85c,color:#4a3a12;
+  class fe,be svc;
+  class db,r2 data;
+  class edge edge;
+</pre>
+<div class="diagram-legend">
+    <div><span class="legend-line solid"></span> Public HTTPS traffic</div>
+    <div><span class="legend-line dashed"></span> Browser API calls</div>
+    <div><span class="legend-line thick"></span> Private Railway network</div>
+</div>
+</div>
+
+                <p>Every public hostname is proxied through Cloudflare. The backend talks to Postgres over Railway&rsquo;s private network and to R2 over the public internet through Cloudflare&rsquo;s S3-compatible API.</p>
+
+                <h2>Application services on Railway</h2>
+                <p>All three application pieces run as Railway services in a single project. They&rsquo;re all built with Railpack, Railway&rsquo;s zero-config builder, so I haven&rsquo;t had to write or maintain Dockerfiles for any of them.</p>
+
+                <p><strong>Backend.</strong> Spring Boot on Java 21, built from the <code>Rate-My-Uni/backend</code> GitHub repo. It owns authentication, university and course reviews, blog posts, the mailing list, transactional email, and image reads and writes against R2. It runs as a single replica today.</p>
+
+                <p><strong>Frontend.</strong> A React SPA with Material UI, built with <code>CI=false npm run build</code> and served with <code>npm run prod --omit=dev</code>. The interesting wrinkle is that the SPA calls the backend at its <em>public</em> Railway domain (<code>backend-production-c62d.up.railway.app</code>), not over Railway&rsquo;s private network. That&rsquo;s because the calls originate in the user&rsquo;s browser, not from the frontend container, so the private network isn&rsquo;t available to them.</p>
+
+                <p><strong>Postgres.</strong> The official <code>postgres-ssl:17</code> image with a Railway volume mounted at <code>/var/lib/postgresql/data</code>. The backend reaches it at <code>postgres.railway.internal:5432</code> on the private network, and a public TCP proxy is exposed on <code>ballast.proxy.rlwy.net:35646</code> for admin tooling.</p>
+
+                <p>Why Railway in the first place? Sensible defaults, private networking out of the box, and source-to-service deploys straight from GitHub. For a one-person project, that&rsquo;s the right level of abstraction.</p>
+
+                <h2>The Cloudflare edge</h2>
+                <p>Two Cloudflare zones front the app, both on the Free plan. <code>ratemyuni.co.uk</code> and <code>www.ratemyuni.co.uk</code> are proxied CNAMEs pointing at the Railway frontend. Cloudflare terminates TLS, caches static assets at the edge, and applies WAF rules in front of the origin. Same story for the images domain.</p>
+
+                <p>One deliberate asymmetry: the SPA&rsquo;s API calls go straight to the backend&rsquo;s <code>.up.railway.app</code> hostname, bypassing Cloudflare. That keeps API responses out of the CDN (no risk of stale review data getting cached at the edge) but it also means the API doesn&rsquo;t sit behind Cloudflare&rsquo;s WAF. The natural next step is to put the API on a proxied <code>api.ratemyuni.co.uk</code> CNAME with caching disabled but WAF on, so the backend gets edge protection without the cache surprises.</p>
+
+                <h2>Object storage with Cloudflare R2</h2>
+                <p>User-uploaded images live in an R2 bucket called <code>rate-my-uni-images</code>. They&rsquo;re served from <code>rate-my-uni-images.co.uk</code>, which is bound to the bucket as a Cloudflare custom domain. The default <code>pub-….r2.dev</code> URL is turned off, so there&rsquo;s only one public way to reach the bucket.</p>
+
+                <p>Two reasons R2 instead of S3. First, egress out of R2 is free, and image bandwidth on a review site adds up fast. Second, the bucket sits in the same Cloudflare account as the DNS, which keeps the wiring simple: one place to manage the custom domain, the TLS cert, and the bucket policy.</p>
+
+                <h2>Auth and email: the multi-provider parts</h2>
+                <p>Auth supports three flows, all of which end in a JWT: email and password, Google OAuth, and email magic links. The shared JWT layer means the API itself doesn&rsquo;t care which path the user took. From the API&rsquo;s perspective there&rsquo;s one auth contract; the differences live in the sign-in code.</p>
+
+                <p>Email is split across two providers, by purpose:</p>
+                <ul class="prose-list">
+                    <li><strong>Zoho Mail</strong> owns the <code>@ratemyuni.co.uk</code> mailboxes. The backend sends user-facing mail through <code>smtppro.zoho.eu</code>.</li>
+                    <li><strong>Resend</strong>, sitting on top of Amazon SES, handles transactional email. The <code>send.ratemyuni.co.uk</code> subdomain has its own SPF and DKIM records pointing at Amazon SES.</li>
+                </ul>
+                <p>The split was deliberate. Zoho is great for inbox-to-inbox conversation, but transactional volume is cleaner through a sender like Resend, and keeping it on a subdomain means a deliverability problem on one path can&rsquo;t poison the other. If Resend ever gets flagged, the mailboxes keep working.</p>
+
+                <h2>What I&rsquo;d change next</h2>
+                <p>A few changes I want to make next, roughly in priority order. The top two are bigger architectural moves; the rest are operational rough edges that will bite once the app gets real traffic.</p>
+
+                <ol>
+                    <li><strong>Dockerise the backend.</strong> Today Railpack auto-builds the Spring Boot app straight from source. It works, but it&rsquo;s a black box. I don&rsquo;t pin a JDK base image, I can&rsquo;t do multi-stage builds for smaller production layers, and switching builders means starting from scratch. A real Dockerfile gives me an explicit base image, reproducible builds, and the same artifact I can run locally with <code>docker run</code>. It&rsquo;s also the unlock for the next item: anywhere that takes a container can host the backend.</li>
+                    <li><strong>Move the backend to GCP.</strong> Once the backend is a container, Cloud Run is the obvious target. It&rsquo;s stateless, scales to zero between bursts of traffic, and per-request billing fits the load shape of a side project better than an always-on Railway VM.</li>
+                    <li><strong>In-process cache on a single replica.</strong> The backend uses EhCache, which lives in the JVM heap. Today there&rsquo;s exactly one instance, so the cache is consistent by definition. The moment it scales to two, each instance holds its own copy and they drift apart until invalidation reaches them. Before scaling out, this needs to move to a shared cache (Memorystore on GCP if the backend moves there, Redis on Railway if it doesn&rsquo;t).</li>
+                    <li><strong>Postgres public TCP proxy.</strong> Railway exposes Postgres on a public TCP proxy alongside the private network address. It&rsquo;s behind credentials, but I&rsquo;d rather restrict it to an IP allowlist or disable it entirely except when I need it from a laptop. This gets more pointed if the backend moves off Railway, since it would then have to talk to Postgres over that public proxy unless Postgres moves too.</li>
+                </ol>
+
+                <h2>Wrap-up</h2>
+                <p>For a small project the multi-provider split was the right call. Railway is good at running services I don&rsquo;t want to babysit. Cloudflare is good at being a cheap, reliable edge with object storage attached. Putting each provider on the part of the stack it&rsquo;s best at meant I didn&rsquo;t have to overbuild any one piece.</p>
+
+                <p>The trade-off is more places to configure DNS, secrets, and IAM. That&rsquo;s fine when the team is one person and the architecture fits on the back of an envelope. If the team or the surface area grows, the next move is consolidating the public edge under a single proxied domain so the backend gets the same protection the frontend already has.</p>
+
+                <a class="article-back" href="/blogs.html">&larr; Back to blog</a>
+            </div>
+        </article>
+    </div>
+
+    <footer class="site-footer">
+        &copy; <span id="year">2026</span> Tadiwanashe Dzvoti ·
+        <a href="https://github.com/TDD66" target="_blank" rel="noopener">GitHub</a> ·
+        <a href="https://www.linkedin.com/in/tadiwanashe-dzvoti-5999681a4/" target="_blank" rel="noopener">LinkedIn</a>
+    </footer>
+
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

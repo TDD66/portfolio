@@ -19,12 +19,30 @@
     </nav>
 
     <div class="container">
-        <div class="coming-soon">
-            <div class="coming-soon-eyebrow">Blog</div>
-            <h1>Coming soon</h1>
-            <p>Notes on the things I&rsquo;m learning, including backend performance, GCP, and the messy details of shipping software, will land here.</p>
-            <a class="btn btn-primary" href="/">Back to home</a>
+        <header class="page-header">
+            <div class="page-header-eyebrow">Blog</div>
+            <h1>Writing</h1>
+            <p>Notes on the things I&rsquo;m learning. Backend, cloud, and the messy details of shipping software in production.</p>
+        </header>
+
+        <div class="blog-list">
+            <article class="blog-entry">
+                <div class="blog-entry-date">31 May 2026</div>
+                <h2><a href="/blogs/rate-my-uni-architecture.html">How Rate My Uni runs: a multi-provider Railway and Cloudflare architecture</a></h2>
+                <p>A walkthrough of the production setup behind Rate My Uni. Compute and data on Railway, the public edge on Cloudflare, image storage on R2, and the trade-offs that come from splitting a small app across two providers.</p>
+                <a class="blog-entry-read" href="/blogs/rate-my-uni-architecture.html">Read post &rarr;</a>
+            </article>
         </div>
     </div>
+
+    <footer class="site-footer">
+        &copy; <span id="year">2026</span> Tadiwanashe Dzvoti ·
+        <a href="https://github.com/TDD66" target="_blank" rel="noopener">GitHub</a> ·
+        <a href="https://www.linkedin.com/in/tadiwanashe-dzvoti-5999681a4/" target="_blank" rel="noopener">LinkedIn</a>
+    </footer>
+
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
